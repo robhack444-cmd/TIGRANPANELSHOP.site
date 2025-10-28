@@ -36,6 +36,9 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
         }
+        .modal {
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body class="text-white">
@@ -68,6 +71,83 @@
             </div>
         </div>
     </header>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4 modal">
+        <div class="bg-gray-900 border border-purple-500/30 rounded-xl p-6 max-w-md w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white">РЕГИСТРАЦИЯ</h3>
+                <button onclick="hideRegister()" class="text-gray-400 hover:text-white text-xl">✕</button>
+            </div>
+
+            <form id="registerForm" class="space-y-4">
+                <div>
+                    <label class="text-gray-300 block mb-2">USERNAME</label>
+                    <input type="text" id="regUsername" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:outline-none" required>
+                </div>
+
+                <div>
+                    <label class="text-gray-300 block mb-2">Your Email</label>
+                    <input type="email" id="regEmail" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:outline-none" required>
+                </div>
+
+                <div>
+                    <label class="text-gray-300 block mb-2">Create your password</label>
+                    <input type="password" id="regPassword" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:outline-none" required>
+                </div>
+
+                <div>
+                    <label class="text-gray-300 block mb-2">Confirm your password</label>
+                    <input type="password" id="regConfirmPassword" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:outline-none" required>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg font-semibold text-white transition-colors">
+                    <i class="fas fa-user-plus mr-2"></i>ЗАРЕГИСТРИРОВАТЬСЯ
+                </button>
+            </form>
+
+            <p class="text-gray-400 text-sm mt-4 text-center">
+                Уже есть аккаунт? 
+                <button onclick="switchToLogin()" class="text-purple-400 hover:text-purple-300">Войти</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4 modal">
+        <div class="bg-gray-900 border border-purple-500/30 rounded-xl p-6 max-w-md w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white">ВХОД В АККАУНТ</h3>
+                <button onclick="hideLogin()" class="text-gray-400 hover:text-white text-xl">✕</button>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="text-gray-300 block mb-2">Enter your USERNAME</label>
+                    <input type="text" id="loginUsername" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:outline-none" required>
+                </div>
+
+                <div>
+                    <label class="text-gray-300 block mb-2">Enter your email</label>
+                    <input type="email" id="loginEmail" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:outline-none" required>
+                </div>
+
+                <div>
+                    <label class="text-gray-300 block mb-2">Enter your password</label>
+                    <input type="password" id="loginPassword" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:outline-none" required>
+                </div>
+
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-semibold text-white transition-colors">
+                    <i class="fas fa-sign-in-alt mr-2"></i>ВОЙТИ
+                </button>
+            </form>
+
+            <p class="text-gray-400 text-sm mt-4 text-center">
+                Нет аккаунта? 
+                <button onclick="switchToRegister()" class="text-green-400 hover:text-green-300">Зарегистрироваться</button>
+            </p>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="relative py-20 px-4 text-center">
@@ -307,7 +387,103 @@
     <script>
         let currentProduct = '';
         let currentPrice = '';
+        let users = JSON.parse(localStorage.getItem('users')) || [];
 
+        // Register Modal Functions
+        function showRegister() {
+            document.getElementById('registerModal').classList.remove('hidden');
+            document.getElementById('registerModal').classList.add('flex');
+        }
+
+        function hideRegister() {
+            document.getElementById('registerModal').classList.add('hidden');
+            document.getElementById('registerModal').classList.remove('flex');
+        }
+
+        // Login Modal Functions
+        function showLogin() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('loginModal').classList.add('flex');
+        }
+
+        function hideLogin() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('flex');
+        }
+
+        // Switch between modals
+        function switchToLogin() {
+            hideRegister();
+            showLogin();
+        }
+
+        function switchToRegister() {
+            hideLogin();
+            showRegister();
+        }
+
+        // Register Form Handler
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                alert('❌ Пароли не совпадают! Попробуйте еще раз.');
+                return;
+            }
+
+            // Check if user already exists
+            const existingUser = users.find(user => user.username === username || user.email === email);
+            if (existingUser) {
+                alert('❌ Пользователь с таким именем или email уже существует!');
+                return;
+            }
+
+            // Create new user
+            const newUser = {
+                username: username,
+                email: email,
+                password: password
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            alert('✅ Регистрация успешна! Теперь вы можете войти в свой аккаунт.');
+            hideRegister();
+            showLogin();
+        });
+
+        // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Find user
+            const user = users.find(user => 
+                user.username === username && 
+                user.email === email && 
+                user.password === password
+            );
+
+            if (user) {
+                alert('✅ Вход успешен! Добро пожаловать, ' + username + '!');
+                hideLogin();
+                // Здесь можно добавить логику для авторизованного пользователя
+            } else {
+                alert('❌ Неправильное имя пользователя, email или пароль! Попробуйте еще раз.');
+            }
+        });
+
+        // Payment Functions
         function showPayment(product, price) {
             currentProduct = product;
             currentPrice = price;
@@ -327,14 +503,6 @@
             alert('✅ Оплата принята! Свяжитесь с нами в Telegram: @ARMFFSOFTVIPMODS1 для получения товара: ' + currentProduct);
         }
         
-        function showRegister() {
-            alert('📝 Для регистрации напишите в Telegram: @ARMFFSOFTVIPMODS1\nМы создадим для вас аккаунт и предоставим доступ к продуктам!');
-        }
-        
-        function showLogin() {
-            alert('🔐 Для входа в аккаунт используйте данные, которые мы предоставили при регистрации.\nЕсли забыли пароль - напишите в поддержку.');
-        }
-        
         function scrollToProducts() {
             document.getElementById('products').scrollIntoView({behavior: 'smooth'});
         }
@@ -343,7 +511,19 @@
             alert('❓ Частые вопросы:\n\n1. Как получить товар после оплаты?\n- Свяжитесь с нами в Telegram\n\n2. Гарантия от бана?\n- Да, 30 дней гарантия\n\n3. Поддержка каких игр?\n- Все популярные FPS игры\n\n4. Технические требования?\n- Windows 10/11, 8GB RAM');
         }
 
-        // Close modal when clicking outside
+        // Close modals when clicking outside
+        document.getElementById('registerModal').addEventListener('click', function(e) {
+            if (e.target.id === 'registerModal') {
+                hideRegister();
+            }
+        });
+
+        document.getElementById('loginModal').addEventListener('click', function(e) {
+            if (e.target.id === 'loginModal') {
+                hideLogin();
+            }
+        });
+
         document.getElementById('paymentModal').addEventListener('click', function(e) {
             if (e.target.id === 'paymentModal') {
                 hidePayment();
